@@ -118,20 +118,21 @@ int main(void)
 
   struct spi_ioc_transfer xfer;
   memset(&xfer, 0, sizeof(xfer));
-  char dataBuffer[3];
-  char rxBuffer[3];
-  dataBuffer[0] = 0x0B;
-  dataBuffer[1] = 0x02;
-  dataBuffer[2] = 0x00;
+  char dataBuffer[4];
+  char rxBuffer[4];
+  dataBuffer[0] = 0x00;
+  dataBuffer[1] = 0xE0;
+  dataBuffer[2] = 0x1C;
+  dataBuffer[3] = 0x03;
   xfer.tx_buf = (unsigned long)dataBuffer;
   xfer.rx_buf = (unsigned long)rxBuffer;
-  xfer.len = 3;
-  xfer.speed_hz = 500000;
+  xfer.len = 4;
+  xfer.speed_hz = 100000;
   xfer.cs_change = 1;
   xfer.bits_per_word = 8;
   res = ioctl(spiDev, SPI_IOC_MESSAGE(1), &xfer);
   printf("SPI result: %d\n", res);
-  printf("Device ID: %d - %d - %d\n", rxBuffer[2], rxBuffer[1], rxBuffer[0]);
+  printf("Device ID: %d - %d - %d\n", rxBuffer[3], rxBuffer[2], rxBuffer[1], rxBuffer[0]);
 }
 
 
