@@ -1,5 +1,6 @@
 # Bitmap files: Use 24-bit bitmap
 BITMAP_FILES = ['face01.bmp', 'face02.bmp', 'face03.bmp', 'face04.bmp']
+#BITMAP_FILES = ['hunter.bmp']
 
 # Output text file
 OUTPUT_FILE = 'ledmaps.txt'
@@ -115,6 +116,30 @@ for bmp_file in BITMAP_FILES:
 # Close output file
 out_file.close()
 
-# Test - read file
+# ***Test - read file
 with open(OUTPUT_FILE) as f:
-    content = f.readlines()
+    content = f.read().splitlines()
+
+# Create list of strings for LED matrix
+ledmap = []
+i = 0
+pix_str = ''
+for n in content[0]:
+    if n.isdigit():
+        pix_str = pix_str + n
+        if (i % 3 == 2):
+            ledmap.append(pix_str)
+            pix_str = ''
+        i = i + 1
+
+# Convert list of strings to bytes for LED matrix
+led_out = []
+for n in ledmap:
+    r_val = ((1 << 4) << int(n[0])) & 0xe0
+    g_val = ((1 << 1) << int(n[1])) & 0x1c
+    b_val = int(n[2])
+    pix_val = r_val + g_val + b_val
+    led_out.append(pix_val)
+        
+print ledmap
+print led_out
