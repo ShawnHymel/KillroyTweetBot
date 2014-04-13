@@ -27,8 +27,14 @@ SPRITE_FILES = [['1 left', 'eye_1_left.bmp'], \
                 ['2 right', 'eye_2_right.bmp'], \
                 ['3 left', 'eye_3_left.bmp'], \
                 ['3 right', 'eye_3_right.bmp'], \
+                ['camclose left', 'eye_camclose_left.bmp'], \
+                ['camclose right', 'eye_camclose_right.bmp'], \
+                ['camopen left', 'eye_camopen_left.bmp'], \
+                ['camopen right', 'eye_camopen_right.bmp'], \
                 ['closed left', 'eye_closed_left.bmp'], \
                 ['closed right', 'eye_closed_right.bmp'], \
+                ['heart left', 'eye_heart_left.bmp'], \
+                ['heart right', 'eye_heart_right.bmp'], \
                 ['open left', 'eye_open_left.bmp'], \
                 ['open right', 'eye_open_right.bmp']]
      
@@ -69,18 +75,30 @@ def map_led(val):
         return 2
     if (val >= 192):
         return 3
+        
+# Create list of bytes for LED matrix
+def map_to_led(led_val):
+
+    # Convert list of strings to bytes for LED matrix
+    led_out = []
+    for y in led_val:
+        for n in y:
+            r_val = ((1 << 4) << int(n[0])) & 0xe0
+            g_val = ((1 << 1) << int(n[1])) & 0x1c
+            b_val = int(n[2])
+            pix_val = r_val + g_val + b_val
+            led_out.append(pix_val)
+
+    return led_out
 
 #-------------------------------------------------------------------------------
-# Main
+# Main script
 #-------------------------------------------------------------------------------
 
-def main():
+def read_sprites():
 
     # Create blank dictionary
     led_dict = {}
-
-    #***TEST
-    key_name = '1 left'
     
     # Create array from each bitmap file
     for bmp_file in SPRITE_FILES:
@@ -153,6 +171,9 @@ def main():
                             led_string[((byte_num + B) * 2) + 1]
                 led_matrix[y][x].append(map_led(int(byte_val, 16)))
                 
+        # Convert LED matrix to SparkFun Serial Backpack values
+        led_matrix = map_to_led(led_matrix)
+        
         # Add array to dictionary with keyname
         led_dict[bmp_file[0]] = led_matrix
             
@@ -162,4 +183,5 @@ def main():
     out_file.close()
 
 # Run main
-main()
+if __name__ == "__main__":
+    read_sprites()
