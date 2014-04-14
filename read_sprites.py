@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Converts 8x8 (24-bit) bitmaps to text file with LED matrixc data
+# Read Sprites
 #
 # Author: Shawn Hymel
 # Date: April 12, 2014
@@ -27,16 +27,26 @@ SPRITE_FILES = [['1 left', 'eye_1_left.bmp'], \
                 ['2 right', 'eye_2_right.bmp'], \
                 ['3 left', 'eye_3_left.bmp'], \
                 ['3 right', 'eye_3_right.bmp'], \
+                ['angry left', 'eye_angry_left.bmp'], \
+                ['angry right', 'eye_angry_right.bmp'], \
                 ['camclose left', 'eye_camclose_left.bmp'], \
                 ['camclose right', 'eye_camclose_right.bmp'], \
                 ['camopen left', 'eye_camopen_left.bmp'], \
                 ['camopen right', 'eye_camopen_right.bmp'], \
                 ['closed left', 'eye_closed_left.bmp'], \
                 ['closed right', 'eye_closed_right.bmp'], \
+                ['happy left', 'eye_happy_left.bmp'], \
+                ['happy right', 'eye_happy_right.bmp'], \
                 ['heart left', 'eye_heart_left.bmp'], \
                 ['heart right', 'eye_heart_right.bmp'], \
+                ['lookleft left', 'eye_lookleft_left.bmp'], \
+                ['lookleft right', 'eye_lookleft_right.bmp'], \
+                ['lookright left', 'eye_lookright_left.bmp'], \
+                ['lookright right', 'eye_lookright_right.bmp'], \
                 ['open left', 'eye_open_left.bmp'], \
-                ['open right', 'eye_open_right.bmp']]
+                ['open right', 'eye_open_right.bmp'], \
+                ['sad left', 'eye_sad_left.bmp'], \
+                ['sad right', 'eye_sad_right.bmp']]
      
 # Global constants    
 NIBBLES_PER_BYTE = 2
