@@ -3,7 +3,9 @@
 #
 # Author: Shawn Hymel
 # Date: April 12, 2014
-# License: Beerware
+# License: This code is beerware; if you see me (or any other SparkFun employee)
+# at the local, and you've found our code helpful, please buy us a round!
+# Distributed as-is; no warranty is given.
 #
 # Reads 8x8 sprites from sprites/ directory and converts them to LED array
 # values. These values are stored in a text file in the root directory of the
