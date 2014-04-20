@@ -35,6 +35,30 @@ import sys
 import time
 
 #-------------------------------------------------------------------------------
+# Robot functions
+#-------------------------------------------------------------------------------
+
+# Drive Kilroy forward
+def drive_forward(ds, user):
+    ds.drive_forward(DRIVE_TIME['fwd'])
+    
+# Drive Kilroy backward
+def drive_backward(ds, user):
+    ds.drive_backward(DRIVE_TIME['bck'])
+    
+# Drive Kilroy left
+def drive_left(ds, user):
+    ds.drive_left(DRIVE_TIME['lft'])
+    
+# Drive Kilroy right
+def drive_right(ds, user):
+    ds.drive_right(DRIVE_TIME['rgt'])
+    
+# Take a picture and post to Twitter
+def take_picture(ds, user):
+    print 'Taking picture, ' + user
+
+#-------------------------------------------------------------------------------
 # User parameters
 #-------------------------------------------------------------------------------
 
@@ -53,24 +77,29 @@ TWITTER_AUTH = {    'app_key': 'QP9zzvRZWgjDJkGgK8TZ6g',
 # The robot's Twitter handle. With an @ sign.
 HANDLE = '@KilroyTheRobot'
 
-# List of accepted commands
-COMMANDS = ['!fwd', '!bck', '!lft', '!rgt', '!pic']
+# Accepted commands along with their appropriate function call
+COMMANDS = {'!fwd':drive_forward, 
+            '!bck':drive_backward, 
+            '!lft':drive_left, 
+            '!rgt':drive_right, 
+            '!pic':take_picture}
+
+# Drive time (in seconds) for [forward, backward, left, right]
+DRIVE_TIME = {'fwd':1, 'bck':1, 'lft':0.5, 'rgt':0.5}
                     
 #-------------------------------------------------------------------------------
 # Import custom modules
 #-------------------------------------------------------------------------------
 
 # Add motor_driver module to path
-if DEBUG < 2:
-    path = os.path.join(os.path.dirname(__file__), 'py_apps/motor_driver')
-    sys.path.append(path)
+path = os.path.join(os.path.dirname(__file__), 'py_apps/drive_system')
+sys.path.append(path)
 
 # Add tweet_feed module to path
 path = os.path.join(os.path.dirname(__file__), 'py_apps/tweet_feed')
 sys.path.append(path)
 
-if DEBUG < 2:
-    import motor_driver
+import drive_system
 import tweet_feed
 
 #-------------------------------------------------------------------------------
@@ -92,17 +121,33 @@ import tweet_feed
 # Runs the main Kilroy loop. Waits for incoming Tweets and performs actions.
 def run_kilroy():
 
+    # Initialize user
+    user = None
+
     # Create a TweetFeed object
     tf = tweet_feed.TweetFeed(TWITTER_AUTH, DEBUG)
     
+    # Create a DriveSystem object
+    ds = drive_system.DriveSystem(DEBUG)
+    
+    # Get start time
+    start_time = time.time()
+    
+    # Start Twitter API streamer to look for Tweets at Kilroy
+    tf.start_streamer(HANDLE, COMMANDS)
+    
     #***TEST***
     print 'Here we go! Waiting for ' + HANDLE
-    print COMMANDS
-    tf.start_streamer(HANDLE, COMMANDS)
-    time.sleep(10)
+    while ((time.time() - start_time) < 30):
+        cmd_list = tf.get_commands()
+        for cmd in cmd_list:
+            if cmd[0] == '@':
+                user = cmd
+            else:
+                COMMANDS[cmd](ds, user)
+        time.sleep(0.1)
+    
     print 'I\'m tired. I think I\'ll take a nap.'
-    commands = tf.get_commands()
-    print commands
     tf.stop_streamer()
 
     return

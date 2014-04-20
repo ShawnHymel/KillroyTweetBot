@@ -38,6 +38,13 @@ class TweetStreamer(TwythonStreamer):
     # Callback from streamer when robot's name appears in a Tweet. Fill queue.
     def on_success(self, data):
         if 'text' in data:
+        
+            # Add user to command list
+            usr = data['user']['screen_name'].encode('utf-8')
+            usr = '@' + usr
+            self.parent.put_command(usr)
+            
+            # Extract commands from Tweet and place in queue
             msg = data['text'].encode('utf-8')
             words = msg.split(' ')
             cmds = [w for w in words if w in self.cmd_list]
