@@ -39,9 +39,9 @@ spi.transfer(tuple(data))
 # Send ledmap
 data = [0x26]
 spi.transfer(tuple(data))
-spi.transfer(tuple(led_dict['open right']))
+spi.transfer(tuple(led_dict['dead right']))
 time.sleep(0.01)
-spi.transfer(tuple(led_dict['open left']))
+spi.transfer(tuple(led_dict['dead left']))
 
 # Delay
 time.sleep(1)

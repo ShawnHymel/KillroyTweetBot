@@ -17,7 +17,7 @@ pygame.init()
 
 # Initialize camera
 pygame.camera.init()
-cam = pygame.camera.Camera("/dev/video1",(640,480))
+cam = pygame.camera.Camera("/dev/video0",(640,480))
 
 # Count down to picture shoot
 print "Taking picture in..."
@@ -36,4 +36,4 @@ time.sleep(1)
 # Post to Twitter
 photo = open('image.jpg')
 #twitter.update_status(status="Why, hello world.")
-twitter.update_status_with_media(status="Oh boy! A new body!", media=photo)
+twitter.update_status_with_media(status="More pics!", media=photo)

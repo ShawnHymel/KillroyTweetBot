@@ -69,6 +69,7 @@ class LEDDriver:
             
     # Draw eyes on LED matrices
     def draw_eyes(self, left_eye, right_eye):
+        self.clear_eyes()
         if self.debug > 0:
             print 'Drawing eyes: ' + left_eye + ', ' + right_eye
         if self.debug < 2:
