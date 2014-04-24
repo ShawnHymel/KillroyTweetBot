@@ -1,0 +1,2 @@
+[alive_number_section]
+alive_number = 0

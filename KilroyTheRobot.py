@@ -82,6 +82,13 @@ SHUTOFF_LEVEL = 30
 # LED maps file (for eyes)
 LEDMAP_FILE = 'ledmaps.txt'
 
+# Alive number file
+ALIVE_NUMBER_FILE = 'alive_number.txt'
+
+# Alive number section and variable
+ALIVE_NUMBER_SECTION = 'alive_number_section'
+ALIVE_NUMBER = 'alive_number'
+
 # Twitter authentication credentials
 TWITTER_AUTH = {    'app_key': 'QP9zzvRZWgjDJkGgK8TZ6g',
                     'app_secret': 'wskPbXryJc1bHbESVmkYrfMHvsCVCty8LiEybvTAw',
@@ -126,10 +133,32 @@ sys.path.append(path)
 import drive_system
 import tweet_feed
 import led_driver
+import ConfigParser
+
+#-------------------------------------------------------------------------------
+# Global Variables
+#-------------------------------------------------------------------------------
+
+g_alive_number = None
 
 #-------------------------------------------------------------------------------
 # Functions
 #-------------------------------------------------------------------------------
+
+def increment_alive_number():
+    global g_alive_number
+    
+    # Open text file
+    config = ConfigParser.RawConfigParser()
+    config.read(ALIVE_NUMBER_FILE)
+    g_alive_number = int(config.get(ALIVE_NUMBER_SECTION, ALIVE_NUMBER))
+    
+    # Increment alive number in param file for next time
+    config.set(ALIVE_NUMBER_SECTION, ALIVE_NUMBER, str(g_alive_number + 1))
+    param_file = open(ALIVE_NUMBER_FILE, 'w')
+    config.write(param_file)
+    param_file.close()
+    del config
 
 # Returns the ADC pin value
 def get_battery_level(pin):
@@ -168,7 +197,7 @@ def run_kilroy():
     start_time = time.time()
     
     # Send hello tweet
-    tf.tweet(START_TWEET)
+    tf.tweet(str(g_alive_number) + ': ' + START_TWEET)
     
     # Start Twitter API streamer to look for Tweets at Kilroy
     tf.start_streamer(HANDLE, COMMANDS)
@@ -201,7 +230,7 @@ def run_kilroy():
         if DEBUG > 0:
             print 'Battery: ' + str(lvl)
         if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and not warning_sent:
-            tf.tweet(LOW_BATT_TWEET)
+            tf.tweet(str(g_alive_number) + ': ' + LOW_BATT_TWEET)
             ld.draw_eyes('sleepy left', 'sleepy right')
             warning_sent = True
         elif (lvl <= SHUTOFF_LEVEL):
@@ -213,7 +242,7 @@ def run_kilroy():
     # Send goodbye tweet and shut down
     if DEBUG > 0:
         print 'I\'m tired. I think I\'ll take a nap.'
-    tf.tweet(END_TWEET)
+    tf.tweet(str(g_alive_number) + ': ' + END_TWEET)
     tf.stop_streamer()
     
     # If auto-shutdown is enabled, shutdown Linux
