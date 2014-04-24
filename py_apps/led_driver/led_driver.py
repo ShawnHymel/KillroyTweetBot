@@ -13,6 +13,7 @@
 
 import os
 import spi
+import time
 
 #-------------------------------------------------------------------------------
 # Class - LEDDriver
@@ -73,6 +74,6 @@ class LEDDriver:
         if self.debug < 2:
             data = [0x26]
             spi.transfer(tuple(data))
-            spi.transfer(tuple(led_dict[right_eye]))
+            spi.transfer(tuple(self.led_dict[right_eye]))
             time.sleep(0.01)
-            spi.transfer(tuple(led_dict[left_eye]))
+            spi.transfer(tuple(self.led_dict[left_eye]))

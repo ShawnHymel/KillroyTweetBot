@@ -13,6 +13,7 @@
 import time
 import os
 import fcntl
+import serial
 from struct import *  
      
 #-------------------------------------------------------------------------------
@@ -36,10 +37,10 @@ class DriveSystem:
         self.BACKWARD = 0
         self.PWM_FREQ = 520
         self.DRIVE_TIME = 1
-        self.TURN_TIME = 1
-        self.SERVO_LEFT = 0
-        self.SERVO_RIGHT = 180
-        self.SERVO_CENTER = 90
+        self.TURN_TIME = 2
+        self.LEFT = 180
+        self.RIGHT = 0
+        self.CENTER = 90
         
         # Declare class members
         self.debug = debug
@@ -61,7 +62,7 @@ class DriveSystem:
         # Configure PWM
         if self.debug < 2:
             with open(self.pwm_file, 'wb') as f:
-                pwm_struct = pack('iiiI', self.steer_pin, 0, 0, PWM_FREQ)
+                pwm_struct = pack('iiiI', self.drive_pin, 0, 0, self.PWM_FREQ)
                 fcntl.ioctl(f, 0x107, pwm_struct)
                 
         # Stop drive motor and set servo to center
@@ -70,10 +71,10 @@ class DriveSystem:
             self.drive_servo(self.CENTER)
         
     # [Private] Direct motor drive
-    def drive_motor(dir, pwm):
+    def drive_motor(self, dir, pwm):
     
         # Set direction
-        os.system('echo ' + str(dir) + ' > ' + self.drive_dir_file)
+        os.system('echo ' + str(dir) + ' > ' + self.dir_file)
         
         # Output PWM to motor
         with open(self.pwm_file, 'wb') as f:
@@ -81,7 +82,7 @@ class DriveSystem:
             fcntl.ioctl(f, 0x106, pwm_struct)
             
     # [Private] Direct servo drive (angle is 0 to 180)
-    def drive_servo(angle):
+    def drive_servo(self, angle):
     
         # Configure servo
         servo = serial.Serial(self.servo_file, 9600, timeout=10)
@@ -148,7 +149,7 @@ class DriveSystem:
         else:
             self.drive_servo(self.LEFT)
             self.drive_motor(self.FORWARD, self.SPEED)
-            time.sleep(self.STEER_TIME)
+            time.sleep(self.TURN_TIME)
             self.drive_motor(self.FORWARD, 0)
             self.drive_servo(self.CENTER)
             
@@ -166,6 +167,6 @@ class DriveSystem:
         else:
             self.drive_servo(self.RIGHT)
             self.drive_motor(self.FORWARD, self.SPEED)
-            time.sleep(self.STEER_TIME)
+            time.sleep(self.TURN_TIME)
             self.drive_motor(self.FORWARD, 0)
-            self.drive_servo(self.center)
+            self.drive_servo(self.CENTER)

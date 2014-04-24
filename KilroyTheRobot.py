@@ -32,7 +32,9 @@
 
 import os
 import sys
+import termios
 import time
+import tty
 import pygame
 import pygame.camera
 
@@ -55,7 +57,10 @@ def drive_left(ds):
 # Drive Kilroy right
 def drive_right(ds):
     ds.drive_right(DRIVE_TIME['rgt'])
-    
+
+# Take picture (placeholder)
+def take_picture(ds):
+    return    
 
 #-------------------------------------------------------------------------------
 # User parameters
@@ -65,7 +70,7 @@ def drive_right(ds):
 #   0 - Run normally
 #   1 - Error and runtime information printed to console
 #   2 - Console output, motor drive off
-DEBUG = 2
+DEBUG = 1
 
 # Automatically shutdown on low battery?
 AUTO_SHUTDOWN = True
@@ -76,8 +81,11 @@ DRIVE_PIN = 5
 ADC_PIN = 0
 
 # Battery levels
-WARN_LEVEL = 40
-SHUTOFF_LEVEL = 30
+WARN_LEVEL = 51
+SHUTOFF_LEVEL = 49
+
+# Camera file
+CAM_FILE = '/dev/video0'
 
 # LED maps file (for eyes)
 LEDMAP_FILE = 'ledmaps.txt'
@@ -102,14 +110,14 @@ HANDLE = '@KilroyTheRobot'
 COMMANDS = {'!fwd':drive_forward, 
             '!bck':drive_backward, 
             '!lft':drive_left, 
-            '!rgt':drive_right}
+            '!rgt':drive_right,
+            '!pic':take_picture}
 
 # Drive time (in seconds) for [forward, backward, left, right]
 DRIVE_TIME = {'fwd':1, 'bck':1, 'lft':0.5, 'rgt':0.5}
 
 # Tweets
-START_TWEET = "I'm Kilroy! Send me a tweet with the commands: !fwd !bck !lft \
-            !rgt !pic"
+START_TWEET = "I'm Kilroy! Send me a tweet with the commands: !fwd !bck !lft !rgt !pic"
 END_TWEET = "I'm tired. I think I'll take a nap."
 PIC_TWEET = "Domo arigato, "
 LOW_BATT_TWEET = "Help me, @ShawnHymel, you're my only hope."
@@ -165,8 +173,24 @@ def get_battery_level(pin):
     
     #***TODO: BATTERY LEVEL MEASUREMENT
     
-    val = 0
+    val = 55
     return val
+
+# Get a key that has been pressed (from Clark on raspberrypi.org/forums)
+def get_key():
+   fd = sys.stdin.fileno()
+   old = termios.tcgetattr(fd)
+   new = termios.tcgetattr(fd)
+   new[3] = new[3] & ~termios.ICANON & ~termios.ECHO
+   new[6][termios.VMIN] = 1
+   new[6][termios.VTIME] = 0
+   termios.tcsetattr(fd, termios.TCSANOW, new)
+   key = None
+   try:
+      key = os.read(fd, 3)
+   finally:
+      termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+   return key
 
 #-------------------------------------------------------------------------------
 # Main
@@ -178,7 +202,7 @@ def run_kilroy():
     # Initialize pygame and camera
     pygame.init()
     pygame.camera.init()
-    cam = pygame.camera.Camera('/dev/video1', (640, 480))
+    cam = pygame.camera.Camera(CAM_FILE, (640, 480))
 
     # Initialize user
     user = ''
@@ -196,6 +220,9 @@ def run_kilroy():
     # Get start time
     start_time = time.time()
     
+    # Increment alive counter
+    increment_alive_number()
+
     # Send hello tweet
     tf.tweet(str(g_alive_number) + ': ' + START_TWEET)
     
@@ -208,13 +235,19 @@ def run_kilroy():
     if DEBUG > 0:
         print 'Here we go! Waiting for ' + HANDLE
     while True:
-    
+        
+        # Look for keypresses and end game on quit
+        if str(get_key()) == 'q':
+            break
+
         # Get commands and parse them
         cmd_list = tf.get_commands()
         for cmd in cmd_list:
             if cmd[0] == '@':
                 user = cmd
             elif cmd == '!pic':
+                if DEBUG > 0:
+                    print 'Taking picture'
                 cam.start()
                 img = cam.get_image()
                 cam.stop()
@@ -228,7 +261,8 @@ def run_kilroy():
         # Check battery voltage level
         lvl = get_battery_level(ADC_PIN)
         if DEBUG > 0:
-            print 'Battery: ' + str(lvl)
+            #print 'Battery: ' + str(lvl)
+            pass
         if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and not warning_sent:
             tf.tweet(str(g_alive_number) + ': ' + LOW_BATT_TWEET)
             ld.draw_eyes('sleepy left', 'sleepy right')
