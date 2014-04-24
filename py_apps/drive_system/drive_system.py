@@ -10,7 +10,10 @@
 # Controls Kilroy's drive motor and steering servo.
 #-------------------------------------------------------------------------------
 
-import time     
+import time
+import os
+import fcntl
+from struct import *  
      
 #-------------------------------------------------------------------------------
 # Class - DriveSystem
@@ -25,11 +28,64 @@ class DriveSystem:
     #   0 - Run normally
     #   1 - Error and runtime information printed to console
     #   2 - Console output, motor drive off
-    def __init__(self, debug=0):
+    def __init__(self, dir_pin, drive_pin, steer_pin, debug=0):
+    
+        # Constants
+        self.SPEED = 255
+        self.FORWARD = 1
+        self.BACKWARD = 0
+        self.PWM_FREQ = 520
+        self.DRIVE_TIME = 1
+        self.TURN_TIME = 1
+        self.SERVO_LEFT = 0
+        self.SERVO_RIGHT = 180
+        self.SERVO_CENTER = 90
         
         # Declare class members
         self.debug = debug
+        self.dir_pin = dir_pin
+        self.drive_pin = drive_pin
+        self.steer_pin = steer_pin
+        
+        # Construct file locations
+        self.dir_mode_file = '/sys/devices/virtual/misc/gpio/mode/gpio' + \
+                                                            str(self.dir_pin)
+        self.dir_file = '/sys/devices/virtual/misc/gpio/pin/gpio' + \
+                                                            str(self.dir_pin)
+        self.pwm_file = '/dev/pwmtimer'
+        
+        # Configure direction pin as output
+        if self.debug < 2:
+            os.system('echo 1' + ' > ' + self.dir_mode_file)
+        
+        # Configure PWM
+        if self.debug < 2:
+            with open(self.pwm_file, 'wb') as f:
+                pwm_struct = pack('iiiI', self.steer_pin, 0, 0, PWM_FREQ)
+                fcntl.ioctl(f, 0x107, pwm_struct)
+                
+        # Stop drive motor and set servo to center
+        if self.debug < 2:
+            self.drive_motor(self.FORWARD, 0)
+            self.drive_servo(self.CENTER)
+        
+    # [Private] Direct motor drive
+    def drive_motor(dir, pwm):
     
+        # Set direction
+        os.system('echo ' + str(dir) + ' > ' + self.drive_dir_file)
+        
+        # Output PWM to motor
+        with open(self.pwm_file, 'wb') as f:
+            pwm_struct = pack('ii', self.drive_pin, pwm)
+            fcntl.ioctl(f, 0x106, pwm_struct)
+            
+    # [Private] Direct servo drive (angle is 0 to 180)
+    def drive_servo(angle):
+        #***DO SERVO STUFF
+        return
+    
+    # [Public] Drive forward for given time
     def drive_forward(self, time_in_sec):
     
         # If debug is on, print to console
@@ -41,9 +97,11 @@ class DriveSystem:
             time.sleep(time_in_sec)
             print '...done'
         else:
-            # Do motor stuff
-            pass
-            
+            self.drive_motor(self.FORWARD, self.SPEED)
+            time.sleep(self.DRIVE_TIME)
+            self.drive_motor(self.FORWARD, 0)
+    
+    # [Public] Drive backward for given time
     def drive_backward(self, time_in_sec):
         
         # If debug is on, print to console
@@ -55,9 +113,11 @@ class DriveSystem:
             time.sleep(time_in_sec)
             print '...done'
         else:
-            # Do motor stuff
-            pass
-            
+            self.drive_motor(self.BACKWARD, self.SPEED)
+            time.sleep(self.DRIVE_TIME)
+            self.drive_motor(self.FORWARD, 0)
+    
+    # [Public] Turn servo left and drive for given time 
     def drive_left(self, time_in_sec):
     
         # If debug is on, print to console
@@ -69,9 +129,13 @@ class DriveSystem:
             time.sleep(time_in_sec)
             print '...done'
         else:
-            # Do motor stuff
-            pass
+            self.drive_servo(self.LEFT)
+            self.drive_motor(self.FORWARD, self.SPEED)
+            time.sleep(self.STEER_TIME)
+            self.drive_motor(self.FORWARD, 0)
+            self.drive_servo(self.CENTER)
             
+    # [Public] Turn servo right and drive for given time 
     def drive_right(self, time_in_sec):
         
         # If debug is on, print to console
@@ -83,5 +147,8 @@ class DriveSystem:
             time.sleep(time_in_sec)
             print '...done'
         else:
-            # Do motor stuff
-            pass
+            self.drive_servo(self.RIGHT)
+            self.drive_motor(self.FORWARD, self.SPEED)
+            time.sleep(self.STEER_TIME)
+            self.drive_motor(self.FORWARD, 0)
+            self.drive_servo(self.center)

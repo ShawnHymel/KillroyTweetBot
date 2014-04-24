@@ -161,3 +161,17 @@ class TweetFeed:
                 commands.append(cmd)
                 
         return commands
+        
+    # [Public] Send tweet
+    def tweet(self, msg):
+        try:
+            self.twitter.update_status(status=msg)
+        except TwythonError as e:
+            print e
+            
+    # [Public] Send tweet with image
+    def tweet_image(self, msg, image):
+        try:
+            self.twitter.update_status_with_media(status=msg, media=image)
+        except TwythonError as e:
+            print e

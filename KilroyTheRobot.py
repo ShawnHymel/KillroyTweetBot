@@ -33,30 +33,29 @@
 import os
 import sys
 import time
+import pygame
+import pygame.camera
 
 #-------------------------------------------------------------------------------
-# Robot functions
+# Drive functions (callbacks from command parser)
 #-------------------------------------------------------------------------------
 
 # Drive Kilroy forward
-def drive_forward(ds, user):
+def drive_forward(ds):
     ds.drive_forward(DRIVE_TIME['fwd'])
     
 # Drive Kilroy backward
-def drive_backward(ds, user):
+def drive_backward(ds):
     ds.drive_backward(DRIVE_TIME['bck'])
     
 # Drive Kilroy left
-def drive_left(ds, user):
+def drive_left(ds):
     ds.drive_left(DRIVE_TIME['lft'])
     
 # Drive Kilroy right
-def drive_right(ds, user):
+def drive_right(ds):
     ds.drive_right(DRIVE_TIME['rgt'])
     
-# Take a picture and post to Twitter
-def take_picture(ds, user):
-    print 'Taking picture, ' + user
 
 #-------------------------------------------------------------------------------
 # User parameters
@@ -67,6 +66,22 @@ def take_picture(ds, user):
 #   1 - Error and runtime information printed to console
 #   2 - Console output, motor drive off
 DEBUG = 2
+
+# Automatically shutdown on low battery?
+AUTO_SHUTDOWN = True
+
+# Pin assignments
+DIR_PIN = 
+DRIVE_PIN = 
+STEER_PIN = 
+ADC_PIN = 
+
+# Battery levels
+WARN_LEVEL = 
+SHUTOFF_LEVEL = 
+
+# LED maps file (for eyes)
+LEDMAP_FILE = 'ledmaps.txt'
 
 # Twitter authentication credentials
 TWITTER_AUTH = {    'app_key': 'QP9zzvRZWgjDJkGgK8TZ6g',
@@ -86,6 +101,13 @@ COMMANDS = {'!fwd':drive_forward,
 
 # Drive time (in seconds) for [forward, backward, left, right]
 DRIVE_TIME = {'fwd':1, 'bck':1, 'lft':0.5, 'rgt':0.5}
+
+# Tweets
+START_TWEET = "I'm Kilroy! Send me a tweet with the commands: !fwd !bck !lft \
+            !rgt !pic"
+END_TWEET = "I'm tired. I think I'll take a nap."
+PIC_TWEET = "Domo arigato, "
+LOW_BATT_TWEET = "Help me, @ShawnHymel, you're my only hope."
                     
 #-------------------------------------------------------------------------------
 # Import custom modules
@@ -99,20 +121,25 @@ sys.path.append(path)
 path = os.path.join(os.path.dirname(__file__), 'py_apps/tweet_feed')
 sys.path.append(path)
 
+# Add led_driver module to path
+path = os.path.join(os.path.dirname(__file__), 'py_apps/led_driver')
+sys.path.append(path)
+
 import drive_system
 import tweet_feed
-
-#-------------------------------------------------------------------------------
-# Constants
-#-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
-# Global Variables
-#-------------------------------------------------------------------------------
+import led_driver
 
 #-------------------------------------------------------------------------------
 # Functions
 #-------------------------------------------------------------------------------
+
+# Returns the ADC pin value
+def get_battery_level(pin):
+    
+    #***TODO: BATTERY LEVEL MEASUREMENT
+    
+    val = 0
+    return val
 
 #-------------------------------------------------------------------------------
 # Main
@@ -121,8 +148,17 @@ import tweet_feed
 # Runs the main Kilroy loop. Waits for incoming Tweets and performs actions.
 def run_kilroy():
 
+    # Initialize pygame and camera
+    pygame.init()
+    pygame.camera.init()
+    cam = pygame.camera.Camera('/dev/video1', (640, 480))
+
     # Initialize user
-    user = None
+    user = ''
+    
+    # Create an LEDDRiver object and draw dead eyes first
+    ld = led_driver.LEDDriver(LEDMAP_FILE, DEBUG)
+    ld.draw_eyes('dead left', 'dead right')
 
     # Create a TweetFeed object
     tf = tweet_feed.TweetFeed(TWITTER_AUTH, DEBUG)
@@ -133,22 +169,57 @@ def run_kilroy():
     # Get start time
     start_time = time.time()
     
+    # Send hello tweet
+    tf.tweet(START_TWEET)
+    
     # Start Twitter API streamer to look for Tweets at Kilroy
     tf.start_streamer(HANDLE, COMMANDS)
     
-    #***TEST***
-    print 'Here we go! Waiting for ' + HANDLE
-    while ((time.time() - start_time) < 30):
+    # Main loop
+    warning_sent = False
+    ld.draw_eyes('open left', 'open right')
+    if debug > 0:
+        print 'Here we go! Waiting for ' + HANDLE
+    while True:
+    
+        # Get commands and parse them
         cmd_list = tf.get_commands()
         for cmd in cmd_list:
             if cmd[0] == '@':
                 user = cmd
+            else if cmd == '!pic':
+                cam.start()
+                img = cam.get_image()
+                cam.stop()
+                #pygame.image.save(img, 'image.jpg')
+                #time.sleep(1)
+                #img = open('image.jpg')
+                tf.tweet_image(PIC_TWEET + user, img)
             else:
-                COMMANDS[cmd](ds, user)
+                COMMANDS[cmd](ds)
+                
+        # Check battery voltage level
+        lvl = get_battery_level(ADC_PIN)
+        if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and !warning_sent:
+            tf.tweet(LOW_BATT_TWEET)
+            ld.draw_eyes('sleepy left', 'sleepy right')
+            warning_sent = True
+        else if (lvl <= SHUTOFF_LEVEL):
+            break
+        
+        # Sleep
         time.sleep(0.1)
     
-    print 'I\'m tired. I think I\'ll take a nap.'
+    # Send goodbye tweet and shut down
+    if debug > 0:
+        print 'I\'m tired. I think I\'ll take a nap.'
+    tf.tweet(END_TWEET)
     tf.stop_streamer()
+    
+    # If auto-shutdown is enabled, shutdown Linux
+    if AUTO_SHUTDOWN:
+        #***TODO: SHUTDOWN LINUX
+        pass
 
     return
 

@@ -37,6 +37,8 @@ SPRITE_FILES = [['1 left', 'eye_1_left.bmp'], \
                 ['camopen right', 'eye_camopen_right.bmp'], \
                 ['closed left', 'eye_closed_left.bmp'], \
                 ['closed right', 'eye_closed_right.bmp'], \
+                ['dead left', 'eye_dead_left.bmp'], \
+                ['dead right', 'eye_dead_right.bmp'], \
                 ['happy left', 'eye_happy_left.bmp'], \
                 ['happy right', 'eye_happy_right.bmp'], \
                 ['heart left', 'eye_heart_left.bmp'], \
@@ -48,7 +50,9 @@ SPRITE_FILES = [['1 left', 'eye_1_left.bmp'], \
                 ['open left', 'eye_open_left.bmp'], \
                 ['open right', 'eye_open_right.bmp'], \
                 ['sad left', 'eye_sad_left.bmp'], \
-                ['sad right', 'eye_sad_right.bmp']]
+                ['sad right', 'eye_sad_right.bmp'], \
+                ['sleepy left', 'eye_sleepy_left.bmp'], \
+                ['sleepy right', 'eye_sleepy_right.bmp']]
      
 # Global constants    
 NIBBLES_PER_BYTE = 2
