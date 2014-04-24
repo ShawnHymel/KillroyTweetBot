@@ -85,8 +85,8 @@ DRIVE_PIN = 5
 ADC_PIN = 0
 
 # Battery levels
-WARN_LEVEL = 51
-SHUTOFF_LEVEL = 49
+WARN_LEVEL = 40#51
+SHUTOFF_LEVEL = 30#49
 
 # Camera file
 CAM_FILE = '/dev/video0'
@@ -100,6 +100,9 @@ ALIVE_NUMBER_FILE = 'alive_number.txt'
 # Alive number section and variable
 ALIVE_NUMBER_SECTION = 'alive_number_section'
 ALIVE_NUMBER = 'alive_number'
+
+# ADC file
+ADC_FILE = '/proc/adc0'
 
 # Twitter authentication credentials
 TWITTER_AUTH = {    'app_key': 'QP9zzvRZWgjDJkGgK8TZ6g',
@@ -175,9 +178,11 @@ def increment_alive_number():
 # Returns the ADC pin value
 def get_battery_level(pin):
     
-    #***TODO: BATTERY LEVEL MEASUREMENT
+    # Open ADC file and read value
+    fd = open(ADC_FILE, 'r')
+    fd.seek(0)
+    val = fd.read(16)
     
-    val = 55
     return val
 
 # Get a key that has been pressed (from Clark on raspberrypi.org/forums)
@@ -205,8 +210,8 @@ def run_kilroy():
 
     # Initialize pygame and camera
     pygame.init()
-    pygame.camera.init()
-    cam = pygame.camera.Camera(CAM_FILE, (640, 480))
+    #pygame.camera.init()
+    #cam = pygame.camera.Camera(CAM_FILE, (640, 480))
 
     # Initialize user
     user = ''
@@ -252,6 +257,8 @@ def run_kilroy():
             elif cmd == '!pic':
                 if DEBUG > 0:
                     print 'Taking picture'
+                pygame.camera.init()
+                cam = pygame.camera.Camera(CAM_FILE, (640, 480))
                 cam.start()
                 img = cam.get_image()
                 cam.stop()
@@ -264,8 +271,9 @@ def run_kilroy():
                 
         # Check battery voltage level
         lvl = get_battery_level(ADC_PIN)
+        lvl = int(lvl[5:])
         if DEBUG > 0:
-            #print 'Battery: ' + str(lvl)
+            print 'Battery: ' + str(lvl)
             pass
         if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and not warning_sent:
             tf.tweet(str(g_alive_number) + ': ' + LOW_BATT_TWEET)
