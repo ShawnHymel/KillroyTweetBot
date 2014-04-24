@@ -53,6 +53,7 @@ class DriveSystem:
         self.dir_file = '/sys/devices/virtual/misc/gpio/pin/gpio' + \
                                                             str(self.dir_pin)
         self.pwm_file = '/dev/pwmtimer'
+        self.servo_file = '/dev/ttyUSB0'
         
         # Configure direction pin as output
         if self.debug < 2:
@@ -82,7 +83,24 @@ class DriveSystem:
             
     # [Private] Direct servo drive (angle is 0 to 180)
     def drive_servo(angle):
-        #***DO SERVO STUFF
+    
+        # Configure servo
+        servo = serial.Serial(self.servo_file, 9600, timeout=10)
+        
+        # Construct servo angle string
+        hex_str = str(hex(angle))
+        hex_str = list(hex_str[2:])
+        if len(hex_str) < 2:
+            hex_str.insert(0, '0')
+        hex_str = unicode("".join(hex_str))
+        
+        # Create bytearray and send to servo controller
+        data = bytearray.fromhex(hex_str)
+        servo.write(data)
+        
+        # Close serial file
+        servo.close()
+        
         return
     
     # [Public] Drive forward for given time

@@ -71,14 +71,13 @@ DEBUG = 2
 AUTO_SHUTDOWN = True
 
 # Pin assignments
-DIR_PIN = 
-DRIVE_PIN = 
-STEER_PIN = 
-ADC_PIN = 
+DIR_PIN = 8
+DRIVE_PIN = 5
+ADC_PIN = 0
 
 # Battery levels
-WARN_LEVEL = 
-SHUTOFF_LEVEL = 
+WARN_LEVEL = 40
+SHUTOFF_LEVEL = 30
 
 # LED maps file (for eyes)
 LEDMAP_FILE = 'ledmaps.txt'
@@ -200,6 +199,8 @@ def run_kilroy():
                 
         # Check battery voltage level
         lvl = get_battery_level(ADC_PIN)
+        if DEBUG > 0:
+            print 'Battery: ' + str(lvl)
         if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and !warning_sent:
             tf.tweet(LOW_BATT_TWEET)
             ld.draw_eyes('sleepy left', 'sleepy right')
