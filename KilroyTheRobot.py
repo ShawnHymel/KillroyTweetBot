@@ -28,6 +28,10 @@
 #
 # When posting the picture to Twitter, Kilroy will attempt to tag the requesting
 # user.
+#
+# TODO:
+#  - Fix keypress exit
+#  - Get battery level
 #-------------------------------------------------------------------------------
 
 import os
@@ -237,8 +241,8 @@ def run_kilroy():
     while True:
         
         # Look for keypresses and end game on quit
-        if str(get_key()) == 'q':
-            break
+        #if str(get_key()) == 'q':
+        #    break
 
         # Get commands and parse them
         cmd_list = tf.get_commands()
@@ -251,9 +255,9 @@ def run_kilroy():
                 cam.start()
                 img = cam.get_image()
                 cam.stop()
-                #pygame.image.save(img, 'image.jpg')
-                #time.sleep(1)
-                #img = open('image.jpg')
+                pygame.image.save(img, 'image.jpg')
+                time.sleep(1)
+                img = open('image.jpg')
                 tf.tweet_image(PIC_TWEET + user, img)
             else:
                 COMMANDS[cmd](ds)
