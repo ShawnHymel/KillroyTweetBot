@@ -28,7 +28,7 @@ class DriveSystem:
     #   0 - Run normally
     #   1 - Error and runtime information printed to console
     #   2 - Console output, motor drive off
-    def __init__(self, dir_pin, drive_pin, steer_pin, debug=0):
+    def __init__(self, dir_pin, drive_pin,  debug=0):
     
         # Constants
         self.SPEED = 255
@@ -45,7 +45,6 @@ class DriveSystem:
         self.debug = debug
         self.dir_pin = dir_pin
         self.drive_pin = drive_pin
-        self.steer_pin = steer_pin
         
         # Construct file locations
         self.dir_mode_file = '/sys/devices/virtual/misc/gpio/mode/gpio' + \

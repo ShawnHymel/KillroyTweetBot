@@ -95,8 +95,7 @@ HANDLE = '@KilroyTheRobot'
 COMMANDS = {'!fwd':drive_forward, 
             '!bck':drive_backward, 
             '!lft':drive_left, 
-            '!rgt':drive_right, 
-            '!pic':take_picture}
+            '!rgt':drive_right}
 
 # Drive time (in seconds) for [forward, backward, left, right]
 DRIVE_TIME = {'fwd':1, 'bck':1, 'lft':0.5, 'rgt':0.5}
@@ -163,7 +162,7 @@ def run_kilroy():
     tf = tweet_feed.TweetFeed(TWITTER_AUTH, DEBUG)
     
     # Create a DriveSystem object
-    ds = drive_system.DriveSystem(DEBUG)
+    ds = drive_system.DriveSystem(DIR_PIN, DRIVE_PIN, DEBUG)
     
     # Get start time
     start_time = time.time()
@@ -177,7 +176,7 @@ def run_kilroy():
     # Main loop
     warning_sent = False
     ld.draw_eyes('open left', 'open right')
-    if debug > 0:
+    if DEBUG > 0:
         print 'Here we go! Waiting for ' + HANDLE
     while True:
     
@@ -186,7 +185,7 @@ def run_kilroy():
         for cmd in cmd_list:
             if cmd[0] == '@':
                 user = cmd
-            else if cmd == '!pic':
+            elif cmd == '!pic':
                 cam.start()
                 img = cam.get_image()
                 cam.stop()
@@ -201,18 +200,18 @@ def run_kilroy():
         lvl = get_battery_level(ADC_PIN)
         if DEBUG > 0:
             print 'Battery: ' + str(lvl)
-        if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and !warning_sent:
+        if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and not warning_sent:
             tf.tweet(LOW_BATT_TWEET)
             ld.draw_eyes('sleepy left', 'sleepy right')
             warning_sent = True
-        else if (lvl <= SHUTOFF_LEVEL):
+        elif (lvl <= SHUTOFF_LEVEL):
             break
         
         # Sleep
         time.sleep(0.1)
     
     # Send goodbye tweet and shut down
-    if debug > 0:
+    if DEBUG > 0:
         print 'I\'m tired. I think I\'ll take a nap.'
     tf.tweet(END_TWEET)
     tf.stop_streamer()

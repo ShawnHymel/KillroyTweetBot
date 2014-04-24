@@ -69,7 +69,7 @@ class LEDDriver:
     # Draw eyes on LED matrices
     def draw_eyes(self, left_eye, right_eye):
         if self.debug > 0:
-            print 'Drawing eyes: ' + left_eye + ', ' right_eye
+            print 'Drawing eyes: ' + left_eye + ', ' + right_eye
         if self.debug < 2:
             data = [0x26]
             spi.transfer(tuple(data))
