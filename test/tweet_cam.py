@@ -1,3 +1,4 @@
+import os
 import time
 import pygame
 import pygame.camera
@@ -26,6 +27,9 @@ for i in range (0, 3):
     time.sleep(1)
 print "CHEEEEEEESE!"
 
+#***Cludgey USB restart
+os.system("sudo ./usbreset /dev/bus/usb/003/004")
+
 # Capture image and wait for image to write to disk
 cam.start()
 img = cam.get_image()
@@ -37,6 +41,9 @@ time.sleep(1)
 img = open('image.jpg')
 #twitter.update_status(status="Why, hello world.")
 twitter.update_status_with_media(status="More pics!", media=img)
+
+# ***Cludgey USB restart
+os.system("sudo ./usbreset /dev/bus/usb/003/004")
 
 # Capture image and wait for image to write to disk
 cam.start()

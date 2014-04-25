@@ -86,14 +86,17 @@ DEBUG = 1
 # Automatically shutdown on low battery?
 AUTO_SHUTDOWN = True
 
+# Camera USB location
+USB_CAM = '/dev/bus/usb/003/004'
+
 # Pin assignments
 DIR_PIN = 8
 DRIVE_PIN = 5
 ADC_PIN = 0
 
 # Battery levels
-WARN_LEVEL = 32#51
-SHUTOFF_LEVEL = 30#49
+WARN_LEVEL = 51
+SHUTOFF_LEVEL = 49
 
 # Camera file
 CAM_FILE = '/dev/video0'
@@ -121,11 +124,11 @@ TWITTER_AUTH = {    'app_key': 'QP9zzvRZWgjDJkGgK8TZ6g',
 HANDLE = '@KilroyTheRobot'
 
 # Accepted commands along with their appropriate function call
-COMMANDS = {'!fwd':drive_forward, 
-            '!bck':drive_backward, 
-            '!lft':drive_left, 
-            '!rgt':drive_right,
-            '!pic':take_picture}
+COMMANDS = {'forward':drive_forward, 
+            'back':drive_backward, 
+            'left':drive_left, 
+            'right':drive_right}#,
+            #'!pic':take_picture}
 
 # Drive time (in seconds) for [forward, backward, left, right]
 DRIVE_TIME = {'fwd':1, 'bck':1, 'lft':0.5, 'rgt':0.5}
@@ -262,6 +265,8 @@ def run_kilroy():
             if cmd[0] == '@':
                 user = cmd
             elif cmd == '!pic':
+                #***Cludgey USB restart
+                #os.system('sudo ./usbreset ' + USB_CAM)
                 if DEBUG > 0:
                     print 'Taking picture'
                 pygame.camera.init()
