@@ -8,7 +8,7 @@ pygame.init()
 
 # Initialize camera
 pygame.camera.init()
-cam = pygame.camera.Camera("/dev/video0",(640,480))
+cam = pygame.camera.Camera("/dev/video1",(640,480))
 cam.start()
 
 # Capture image

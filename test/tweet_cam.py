@@ -34,6 +34,18 @@ pygame.image.save(img, 'image.jpg')
 time.sleep(1)
 
 # Post to Twitter
-photo = open('image.jpg')
+img = open('image.jpg')
 #twitter.update_status(status="Why, hello world.")
-twitter.update_status_with_media(status="More pics!", media=photo)
+twitter.update_status_with_media(status="More pics!", media=img)
+
+# Capture image and wait for image to write to disk
+cam.start()
+img = cam.get_image()
+cam.stop()
+pygame.image.save(img, 'image.jpg')
+time.sleep(1)
+
+# Post to Twitter
+img = open('image.jpg')
+#twitter.update_status(status="Why, hello world.")
+twitter.update_status_with_media(status="And more pics!", media=img)
