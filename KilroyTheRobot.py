@@ -29,9 +29,16 @@
 # When posting the picture to Twitter, Kilroy will attempt to tag the requesting
 # user.
 #
+# IMPORTANT: USB needs resetting! Find camera and reset:
+#
+#   $ lsusb
+#   $ sudo ./usbreset /dev/bus/usb/002/003
+#
+# Source: http://askubuntu.com/questions/645/how-do-you-reset-a-usb-device-from-the-command-line
+#
 # TODO:
 #  - Fix keypress exit
-#  - Get battery level
+#  - Fix USB reset issues
 #-------------------------------------------------------------------------------
 
 import os
@@ -85,7 +92,7 @@ DRIVE_PIN = 5
 ADC_PIN = 0
 
 # Battery levels
-WARN_LEVEL = 40#51
+WARN_LEVEL = 32#51
 SHUTOFF_LEVEL = 30#49
 
 # Camera file
@@ -273,7 +280,7 @@ def run_kilroy():
         lvl = get_battery_level(ADC_PIN)
         lvl = int(lvl[5:])
         if DEBUG > 0:
-            print 'Battery: ' + str(lvl)
+            #print 'Battery: ' + str(lvl)
             pass
         if (lvl > SHUTOFF_LEVEL) and (lvl <= WARN_LEVEL) and not warning_sent:
             tf.tweet(str(g_alive_number) + ': ' + LOW_BATT_TWEET)

@@ -36,8 +36,8 @@ class DriveSystem:
         self.FORWARD = 1
         self.BACKWARD = 0
         self.PWM_FREQ = 520
-        self.DRIVE_TIME = 1
-        self.TURN_TIME = 2
+        self.DRIVE_TIME = 2
+        self.TURN_TIME = 1
         self.LEFT = 180
         self.RIGHT = 0
         self.CENTER = 90
