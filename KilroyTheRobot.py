@@ -24,7 +24,7 @@
 # For example, to make Kilroy move 30 cm forward, turn right 30 degrees and take
 # a picture, send the Tweet:
 #
-#   @KilroyTheRobot &fwd &fwd &rgt &pic
+#   @KilroyTheRobot forward forward right pic
 #
 # When posting the picture to Twitter, Kilroy will attempt to tag the requesting
 # user.
@@ -265,6 +265,7 @@ def run_kilroy():
             if cmd[0] == '@':
                 user = cmd
             elif cmd == 'pic':
+                ld.draw_eyes('closed left', 'closed right')
                 #***Cludgey USB restart
                 os.system('sudo ./usbreset ' + USB_CAM)
                 if DEBUG > 0:
@@ -274,6 +275,7 @@ def run_kilroy():
                 cam.start()
                 img = cam.get_image()
                 cam.stop()
+                ld.draw_eyes('open left', 'open right')
                 pygame.image.save(img, 'image.jpg')
                 time.sleep(1)
                 img = open('image.jpg')
