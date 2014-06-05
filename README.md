@@ -15,6 +15,12 @@ pcDuino (or any Debian-based Linux system):
  - python read_sprites.py
  - sudo python KilroyTheRobot.py
 
+ To have Kilroy run on boot, add the following lines to /etc/rc.local (before 'exit 0'):
+
+   # Run Kilroy script
+   cd /home/ubuntu/Projects/KilroyTheRobot/
+   python KilroyTheRobot.py
+
 Windows (if you must):
 
  - Download https://raw.github.com/pypa/pip/master/contrib/get-pip.py

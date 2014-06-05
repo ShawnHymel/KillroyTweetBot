@@ -34,6 +34,13 @@
 #   $ lsusb
 #   $ sudo ./usbreset /dev/bus/usb/002/003
 #
+# To have Kilroy run on boot in Linux, add the following lines to /etc/rc.local (before 'exit 0')
+#
+# 
+#   # Run Kilroy script
+#   cd /home/ubuntu/Projects/KilroyTheRobot/
+#   python KilroyTheRobot.py
+#
 # Source: http://askubuntu.com/questions/645/how-do-you-reset-a-usb-device-from-the-command-line
 #
 # TODO:
@@ -81,7 +88,7 @@ def take_picture(ds):
 #   0 - Run normally
 #   1 - Error and runtime information printed to console
 #   2 - Console output, motor drive off
-DEBUG = 1
+DEBUG = 0
 
 # Automatically shutdown on low battery?
 AUTO_SHUTDOWN = True
@@ -131,7 +138,7 @@ COMMANDS = {'forward':drive_forward,
             'pic':take_picture}
 
 # Drive time (in seconds) for [forward, backward, left, right]
-DRIVE_TIME = {'fwd':1, 'bck':1, 'lft':0.5, 'rgt':0.5}
+DRIVE_TIME = {'fwd':2, 'bck':2, 'lft':0.5, 'rgt':0.5}
 
 # Tweets
 START_TWEET = "I'm Kilroy! Send me a tweet with the commands: forward back left right pic"
