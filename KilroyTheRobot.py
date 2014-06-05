@@ -15,11 +15,11 @@
 #
 # The accepted commands are:
 #
-#   !fwd - Kilroy moves forward about 15 cm (6 in.)
-#   !bck - Kilroy moves backward about 15 cm (6 in.)
-#   !lft - Kilroy moves left about 30 deg.
-#   !rgt - Kilroy moves right about 30 deg.
-#   !pic - Kilroy will count down, snap a picture, and post it to Twitter
+#   forward - Kilroy moves forward about 15 cm (6 in.)
+#   back - Kilroy moves backward about 15 cm (6 in.)
+#   left - Kilroy moves left about 30 deg.
+#   right - Kilroy moves right about 30 deg.
+#   pic - Kilroy will count down, snap a picture, and post it to Twitter
 #
 # For example, to make Kilroy move 30 cm forward, turn right 30 degrees and take
 # a picture, send the Tweet:
@@ -127,14 +127,14 @@ HANDLE = '@KilroyTheRobot'
 COMMANDS = {'forward':drive_forward, 
             'back':drive_backward, 
             'left':drive_left, 
-            'right':drive_right}#,
-            #'!pic':take_picture}
+            'right':drive_right,
+            'pic':take_picture}
 
 # Drive time (in seconds) for [forward, backward, left, right]
 DRIVE_TIME = {'fwd':1, 'bck':1, 'lft':0.5, 'rgt':0.5}
 
 # Tweets
-START_TWEET = "I'm Kilroy! Send me a tweet with the commands: !fwd !bck !lft !rgt !pic"
+START_TWEET = "I'm Kilroy! Send me a tweet with the commands: forward back left right pic"
 END_TWEET = "I'm tired. I think I'll take a nap."
 PIC_TWEET = "Domo arigato, "
 LOW_BATT_TWEET = "Help me, @ShawnHymel, you're my only hope."
@@ -220,8 +220,8 @@ def run_kilroy():
 
     # Initialize pygame and camera
     pygame.init()
-    #pygame.camera.init()
-    #cam = pygame.camera.Camera(CAM_FILE, (640, 480))
+    pygame.camera.init()
+    cam = pygame.camera.Camera(CAM_FILE, (640, 480))
 
     # Initialize user
     user = ''
@@ -264,9 +264,9 @@ def run_kilroy():
         for cmd in cmd_list:
             if cmd[0] == '@':
                 user = cmd
-            elif cmd == '!pic':
+            elif cmd == 'pic':
                 #***Cludgey USB restart
-                #os.system('sudo ./usbreset ' + USB_CAM)
+                os.system('sudo ./usbreset ' + USB_CAM)
                 if DEBUG > 0:
                     print 'Taking picture'
                 pygame.camera.init()
